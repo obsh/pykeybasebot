@@ -45,6 +45,25 @@ class ChatClient:
         )
         return chat1.SendRes.from_dict(res)
 
+    async def broadcast(self, message: str) -> chat1.SendRes:
+        """
+        Post a message that is signed but unencrypted and available
+        to anyone.
+        """
+        await self.bot.ensure_initialized()
+        res = await self.execute(
+            {
+                "method": "send",
+                "params": {
+                    "options": {
+                        "channel": {"name": self.bot.username, "public": True},
+                        "message": {"body": message},
+                    }
+                },
+            }
+        )
+        return chat1.SendRes.from_dict(res)
+
     async def react(
         self, channel: chat1.ChatChannel, message_id: chat1.MessageID, reaction: str
     ) -> chat1.SendRes:
