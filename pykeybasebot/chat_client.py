@@ -8,6 +8,7 @@ class ChatClient:
     def __init__(self, bot):
         self.bot = bot
 
+
     async def list(self) -> List[chat1.ConvSummary]:
         """
         Lists your chats, with info on which ones have unread messages.
@@ -16,6 +17,7 @@ class ChatClient:
         res = await self.execute({"method": "list"})
         chat_list = chat1.ChatList.from_dict(res)
         return chat_list.conversations or []
+
 
     async def read(
         self, channel: chat1.ChatChannel
@@ -29,6 +31,7 @@ class ChatClient:
         )
         thread = chat1.Thread.from_dict(res)
         return [message.msg for message in (thread.messages or [])]
+
 
     async def send(self, channel: chat1.ChatChannel, message: str) -> chat1.SendRes:
         await self.bot.ensure_initialized()
@@ -44,6 +47,7 @@ class ChatClient:
             }
         )
         return chat1.SendRes.from_dict(res)
+
 
     async def broadcast(self, message: str) -> chat1.SendRes:
         """
@@ -64,6 +68,7 @@ class ChatClient:
         )
         return chat1.SendRes.from_dict(res)
 
+
     async def react(
         self, channel: chat1.ChatChannel, message_id: chat1.MessageID, reaction: str
     ) -> chat1.SendRes:
@@ -81,6 +86,7 @@ class ChatClient:
             }
         )
         return chat1.SendRes.from_dict(res)
+
 
     async def edit(
         self, channel: chat1.ChatChannel, message_id: chat1.MessageID, message: str
@@ -100,6 +106,25 @@ class ChatClient:
         )
         return chat1.SendRes.from_dict(res)
 
+
+    async def delete(
+        self, channel: chat1.ChatChannel, message_id: chat1.MessageID
+    ) -> chat1.SendRes:
+        await self.bot.ensure_initialized()
+        res = await self.execute(
+            {
+                "method": "delete",
+                "params": {
+                    "options": {
+                        "channel": channel.to_dict(),
+                        "message_id": message_id,
+                    }
+                },
+            }
+        )
+        return chat1.SendRes.from_dict(res)
+
+
     async def attach(
         self, channel: chat1.ChatChannel, filename: str, title: str
     ) -> chat1.SendRes:
@@ -118,6 +143,7 @@ class ChatClient:
         )
         return chat1.SendRes.from_dict(res)
 
+
     async def download(
         self, channel: chat1.ChatChannel, message_id: int, output: str
     ) -> chat1.SendRes:
@@ -135,6 +161,7 @@ class ChatClient:
             }
         )
         return chat1.SendRes.from_dict(res)
+
 
     async def execute(self, command) -> Dict[str, str]:
         resp = await self.bot.submit("chat api", json.dumps(command).encode("utf-8"))
